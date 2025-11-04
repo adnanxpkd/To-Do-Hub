@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>My Profile</h2>
+  <img src="{{ user.profile.avatar.url }}" width="100" class="rounded-circle mb-3" />
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary">Update</button>
+  </form>
+</div>
+{% endblock %}

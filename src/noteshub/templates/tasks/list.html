@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">✅ My To-Do List</h3>
+<a href="{% url 'add_task' %}" class="btn btn-primary mb-3">+ Add Task</a>
+
+<table class="table table-bordered align-middle">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Due Date</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr class="{% if task.is_done %}table-success{% endif %}">
+      <td>{{ task.title }}</td>
+      <td>{{ task.due_date|default:"—" }}</td>
+      <td>
+        {% if task.is_done %}
+          ✅ Done
+        {% else %}
+          ⏳ Pending
+        {% endif %}
+      </td>
+      <td>
+        <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-info">
+          Toggle
+        </a>
+        <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-dark">
+          Edit
+        </a>
+        <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger">
+          Delete
+        </a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No tasks yet. Add one!</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

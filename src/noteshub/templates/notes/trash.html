@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>🗑️ Trash</h3>
+<a href="{% url 'notes_list' %}" class="btn btn-outline-primary mb-3">← Back</a>
+
+<div class="row">
+  {% for note in notes %}
+  <div class="col-md-4 mb-3">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h5>{{ note.title }}</h5>
+        <p>{{ note.content|truncatewords:20 }}</p>
+        <a href="{% url 'restore_note' note.id %}" class="btn btn-sm btn-success">Restore</a>
+        <a href="{% url 'delete_forever' note.id %}" class="btn btn-sm btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No deleted notes.</p>
+  {% endfor %}
+</div>
+{% endblock %}

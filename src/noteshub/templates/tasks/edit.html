@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Edit Task</h3>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Update</button>
+  <a href="{% url 'tasks_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
+{% extends 'base.html' %}
+{% block content %}
+<h3>Edit Task</h3>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Update</button>
+  <a href="{% url 'tasks_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

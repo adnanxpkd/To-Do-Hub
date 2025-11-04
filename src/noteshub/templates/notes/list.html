@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-3">🗒️ My Notes</h3>
+<a href="{% url 'add_note' %}" class="btn btn-primary mb-3">+ Add Note</a>
+
+<div class="row">
+  {% for note in notes %}
+  <div class="col-md-4 mb-3">
+    <div class="card" style="background-color: {{ note.color }}">
+      <div class="card-body">
+        <h5 class="card-title">{{ note.title }}</h5>
+        <p class="card-text">{{ note.content|truncatewords:20 }}</p>
+        {% if note.tags %}<span class="badge bg-dark">{{ note.tags }}</span>{% endif %}
+        <div class="mt-2">
+          <a href="{% url 'edit_note' note.id %}" class="btn btn-sm btn-outline-dark">Edit</a>
+          <a href="{% url 'delete_note' note.id %}" class="btn btn-sm btn-outline-danger">Trash</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No notes yet. Add one!</p>
+  {% endfor %}
+</div>
+{% endblock %}
