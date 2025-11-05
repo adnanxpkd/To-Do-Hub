@@ -111,6 +111,9 @@ else:
         }
     }
 
+CSRF_TRUSTED_ORIGINS = ["https://to-do-hub.onrender.com"]
+
+
 # === PASSWORD VALIDATORS ===
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
