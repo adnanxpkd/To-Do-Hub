@@ -3,16 +3,17 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
+# Load environment variables
 load_dotenv()
 
+# === BASE SETTINGS ===
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-_bs^!qt3%-(46p0=!#!ezeyk5)gf*s!hv=(8r_o6hzdq_vr1xr")
 DEBUG = os.getenv("DEBUG", "True") == "True"
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
-# APPS
+# === APPS ===
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,20 +32,22 @@ INSTALLED_APPS = [
     'tasks',
 ]
 
-# REST FRAMEWORK
+# === REST FRAMEWORK ===
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
 }
 
-# MIDDLEWARE
+# === MIDDLEWARE ===
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',          # CORS should come early
+
+    # CORS early in the stack
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -53,21 +56,21 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    # Whitenoise (for static files in Render)
+    # Whitenoise for static files
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# URL + WSGI
+# === URL & WSGI ===
 ROOT_URLCONF = 'noteshub.urls'
 WSGI_APPLICATION = 'noteshub.wsgi.application'
 
-# TEMPLATES
+# === TEMPLATES ===
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # ✅ Correct path for templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,12 +83,18 @@ TEMPLATES = [
     },
 ]
 
-# DATABASE (Local + Render)
+# === DATABASE (Auto-switch: Supabase / Local PostgreSQL) ===
 if os.getenv("DATABASE_URL"):
+    # Supabase / Render (Production)
     DATABASES = {
-        'default': dj_database_url.config(default=os.getenv("DATABASE_URL"), conn_max_age=600)
+        'default': dj_database_url.config(
+            default=os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True  # Supabase needs SSL
+        )
     }
 else:
+    # Local PostgreSQL (Development)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -97,7 +106,7 @@ else:
         }
     }
 
-# PASSWORD VALIDATION
+# === PASSWORD VALIDATORS ===
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -105,13 +114,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# LANGUAGE + TIMEZONE
+# === LANGUAGE / TIMEZONE ===
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
-# STATIC + MEDIA
+# === STATIC / MEDIA FILES ===
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -119,8 +128,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Whitenoise compression
+# Whitenoise optimized static storage
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# DEFAULTS
+# === DEFAULT FIELD ===
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
