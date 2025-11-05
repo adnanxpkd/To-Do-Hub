@@ -6,7 +6,10 @@ from django.conf.urls.static import static
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse("<h1>Welcome to To-Do Hub!</h1>")
+    if request.user.is_authenticated:
+        return redirect('/notes/')
+    return HttpResponse("<h2>Welcome to To-Do Hub 📝<br><a href='/accounts/login/'>Login</a></h2>")
+
 
 urlpatterns = [
     path('', home),
