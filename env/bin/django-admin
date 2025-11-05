@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/home/adnanxpkd/Pictures/Project/To-Do Hub/env/bin/python3" "$0" "$@"
+'''exec' "/home/adnanxpkd/Pictures/Project/To-Do Hub Project/To-Do Hub Version-1/env/bin/python3" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

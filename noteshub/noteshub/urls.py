@@ -3,19 +3,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from django.http import HttpResponse
-
-def home(request):
-    if request.user.is_authenticated:
-        return redirect('/notes/')
-    return HttpResponse("<h2>Welcome to To-Do Hub 📝<br><a href='/accounts/login/'>Login</a></h2>")
-
 
 urlpatterns = [
-    path('', home),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('notes/', include('notes.urls')),
+    path('', include('notes.urls')),
     path('tasks/', include('tasks.urls')),
 ]
 
