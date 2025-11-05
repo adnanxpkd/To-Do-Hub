@@ -122,7 +122,7 @@ DATABASES = {
 
 # === CSRF ===
 CSRF_TRUSTED_ORIGINS = [
-    "https://to-do-hub.onrender.com"
+    "https://to-do-hub-postgresql.onrender.com"
 ]
 
 # === PASSWORD VALIDATORS ===
