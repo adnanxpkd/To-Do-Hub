@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-import dj_database_url
 import socket
 import psycopg2
 import psycopg2.extensions
@@ -19,11 +18,17 @@ SECRET_KEY = os.getenv(
 )
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
+# === ALLOWED HOSTS (Fixed for Render) ===
 ALLOWED_HOSTS = [
-    "to-do-hub.onrender.com",
     "localhost",
     "127.0.0.1",
+    "to-do-hub-postgresql.onrender.com",
 ]
+
+# Automatically trust Render’s assigned domain
+render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if render_host:
+    ALLOWED_HOSTS.append(render_host)
 
 # === FORCE IPV4 ===
 def force_ipv4():
@@ -108,23 +113,24 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),        # Render DB name
-        'USER': os.getenv('DB_USER'),        # Render DB username
-        'PASSWORD': os.getenv('DB_PASSWORD'),# Render DB password
-        'HOST': os.getenv('DB_HOST'),        # Render DB host (looks like "dpg-xxxxx.render.com")
-        'PORT': os.getenv('DB_PORT', '5432'),# Usually 5432
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
-            'sslmode': 'require',            # Important for Render
+            'sslmode': 'require',
         },
     }
 }
 
-
-# === CSRF ===
+# === CSRF TRUSTED ORIGINS ===
 CSRF_TRUSTED_ORIGINS = [
     "https://to-do-hub-postgresql.onrender.com",
 ]
-
+# Also trust dynamic Render domain
+if render_host:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{render_host}")
 
 # === PASSWORD VALIDATORS ===
 AUTH_PASSWORD_VALIDATORS = [
