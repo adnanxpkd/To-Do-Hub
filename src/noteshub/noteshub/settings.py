@@ -3,6 +3,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
+import socket
+import psycopg2
+import psycopg2.extensions
+import psycopg2.extras
+
 # Load environment variables
 load_dotenv()
 
@@ -17,6 +22,13 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 
+def force_ipv4():
+    original_getaddrinfo = socket.getaddrinfo
+    def getaddrinfo_ipv4(*args, **kwargs):
+        return original_getaddrinfo(*args, family=socket.AF_INET, **kwargs)
+    socket.getaddrinfo = getaddrinfo_ipv4
+
+force_ipv4()
 
 # === APPS ===
 INSTALLED_APPS = [
