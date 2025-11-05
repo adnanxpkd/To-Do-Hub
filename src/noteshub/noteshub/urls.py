@@ -3,7 +3,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("<h1>Welcome to To-Do Hub!</h1>")
+
 urlpatterns = [
+    path('', home),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('notes/', include('notes.urls')),
