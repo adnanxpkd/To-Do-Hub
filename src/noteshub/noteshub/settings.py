@@ -1,27 +1,36 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-import dj_database_url
-
 import socket
 import psycopg2
 import psycopg2.extensions
 import psycopg2.extras
 
-# Load environment variables
+# === LOAD ENVIRONMENT VARIABLES ===
 load_dotenv()
 
 # === BASE SETTINGS ===
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-_bs^!qt3%-(46p0=!#!ezeyk5)gf*s!hv=(8r_o6hzdq_vr1xr")
-DEBUG = os.getenv("DEBUG", "True") == "True"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-_bs^!qt3%-(46p0=!#!ezeyk5)gf*s!hv=(8r_o6hzdq_vr1xr"
+)
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+# === ALLOWED HOSTS (Fixed for Render) ===
 ALLOWED_HOSTS = [
-    "to-do-hub.onrender.com",
     "localhost",
     "127.0.0.1",
+    "to-do-hub-postgresql.onrender.com",
 ]
 
+# Automatically trust Render’s assigned domain
+render_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if render_host:
+    ALLOWED_HOSTS.append(render_host)
+
+# === FORCE IPV4 ===
 def force_ipv4():
     original_getaddrinfo = socket.getaddrinfo
     def getaddrinfo_ipv4(*args, **kwargs):
@@ -30,7 +39,7 @@ def force_ipv4():
 
 force_ipv4()
 
-# === APPS ===
+# === INSTALLED APPS ===
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,7 +58,7 @@ INSTALLED_APPS = [
     'tasks',
 ]
 
-# === REST FRAMEWORK ===
+# === REST FRAMEWORK SETTINGS ===
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -63,7 +72,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # CORS early in the stack
+    # CORS early
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
@@ -73,7 +82,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    # Whitenoise for static files
+    # Static file handling
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -100,31 +109,28 @@ TEMPLATES = [
     },
 ]
 
-# === DATABASE (Auto-switch: Supabase / Local PostgreSQL) ===
-if os.getenv("DATABASE_URL"):
-    # Supabase / Render (Production)
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv("DATABASE_URL"),
-            conn_max_age=600,
-            ssl_require=True  # Supabase needs SSL
-        )
+# === DATABASE (Render PostgreSQL) ===
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-else:
-    # Local PostgreSQL (Development)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'noteshub_db'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
-            'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-        }
-    }
+}
 
-CSRF_TRUSTED_ORIGINS = ["https://to-do-hub.onrender.com"]
-
+# === CSRF TRUSTED ORIGINS ===
+CSRF_TRUSTED_ORIGINS = [
+    "https://to-do-hub-postgresql.onrender.com",
+]
+# Also trust dynamic Render domain
+if render_host:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{render_host}")
 
 # === PASSWORD VALIDATORS ===
 AUTH_PASSWORD_VALIDATORS = [
@@ -148,7 +154,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Whitenoise optimized static storage
+# === WHITENOISE STATIC STORAGE ===
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # === DEFAULT FIELD ===
